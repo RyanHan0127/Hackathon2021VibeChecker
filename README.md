@@ -27,3 +27,6 @@ I know you see me winnin', I love it, oh
 This Drain life, I'm about it
 I'm the founder, yeah, I found it
 Play the game, yeah, I foul it
+
+
+"why are there all of these minorities in my video games?" - Ohr Ben hOmo
