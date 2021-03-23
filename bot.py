@@ -10,12 +10,12 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(BOT_PREFIX)
 
 @bot.command(name = 'vibecheck', pass_context=True)
-async def vibecheck(ctx, *arg):
+async def vibecheck(ctx, arg):
 	current_channel_id = ctx.message.channel.id
 	user_id = ctx.message.author.id
 	print(user_id)
 	channel = bot.get_channel(current_channel_id)
-	messages = await ctx.channel.history(limit=200).flatten()
+	messages = await ctx.channel.history(limit=arg).flatten()
 
 	for msg in messages:
 		if msg.author.id == user_id:
