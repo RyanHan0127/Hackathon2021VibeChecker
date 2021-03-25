@@ -45,7 +45,7 @@ async def vibecheck(ctx, *arg):
 	current_channel_id = ctx.message.channel.id
 	user_id = ctx.message.author.id
 	if isChannel:
-		channel = bot.get_channel(ctx.message.channel_mentions[0])
+		channel = ctx.message.channel_mentions[0]
 	else:
 		channel = bot.get_channel(current_channel_id)
 	messages = await channel.history(limit=amt).flatten()
