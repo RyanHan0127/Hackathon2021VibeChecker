@@ -3,6 +3,7 @@ import logging
 import os
 from dotenv import load_dotenv
 from discord.ext import commands
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as sia
 
 load_dotenv()
 BOT_PREFIX = ("!")
@@ -11,37 +12,29 @@ MSG_LIMIT = 100
 bot = commands.Bot(BOT_PREFIX)
 
 @bot.command(name = 'vibecheck', pass_context=True)
-async def vibecheck(ctx, arg):
-
-    amt = 100      #Default/placeholder, idk if we want to do a mention-based one as well but w/e I added error checking for it anyway
-    isValid = true
-    if not ctx.message.mentions:
-        print("Is not a mention")
-        try:
-            amt = int(arg)
-        except ValueError:
-            isValid = False
-        if not isValid:
-            print("Not an integer")
-            await ctx.send("Argument passed was not an integer or a mention")
-            return
-        else:
-            print("Is an integer")
-    else:
-        #Check for the first message sent by mentioned user in an arbitrary time period and adjust amt accordingly
-        #or something idk
-        print("Is a mention")
-
-
+async def vibecheck(ctx, *arg):
+	amt = MSG_LIMIT
+	if len(arg) == 1:
+		amt = arg[0]
 	current_channel_id = ctx.message.channel.id
 	user_id = ctx.message.author.id
-	print(user_id)
 	channel = bot.get_channel(current_channel_id)
-	messages = await ctx.channel.history(limit=arg).flatten()
+	messages = await ctx.channel.history(limit=amt).flatten()
 
+	sentence = []
 	for msg in messages:
-		if msg.author.id == user_id:
-			print(msg.content + " : " + msg.created_at.strftime("%d/%m/%Y, %H:%M:%S"))
+		if msg.content != '!vibecheck' and msg.content != '':
+			sentence.append(msg.content)
+	#print(sentence)
+	analyzer = sia()
+	list_res = []
+	for sen in sentence:
+		vs = analyzer.polarity_scores(sen)
+		sen_tuple = (sen, vs['compound'])
+		list_res.append(sen_tuple)
+	for i in list_res:
+		print(i)
+	#print(list_res)
 	#await ctx.send("Vibe Check")
 
 @bot.event
