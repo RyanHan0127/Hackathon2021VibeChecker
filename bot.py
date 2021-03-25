@@ -14,12 +14,41 @@ bot = commands.Bot(BOT_PREFIX)
 @bot.command(name = 'vibecheck', pass_context=True)
 async def vibecheck(ctx, *arg):
 	amt = MSG_LIMIT
-	if len(arg) == 1:
-		amt = arg[0]
+	if len(arg) > 1:
+		await ctx.send("Incorrect number of arguments: 0 or 1")
+		return
+
+	isMention = False
+	isInteger = False
+	isChannel = False
+	if len(arg) == 0:
+		pass
+	elif ctx.message.mentions:
+		print("Is a mention")
+		isMention = True
+	elif ctx.message.channel_mentions:
+		print("Is a channel mention")
+		isChannel = True
+	else:
+		try:
+			amt = int(arg[0])
+			isInteger = True
+		except ValueError:
+			isInteger = False
+		if isInteger:
+			print("Is an integer")
+		else:
+			print("Not an integer")
+			await ctx.send("Argument passed was not an integer, mention, or channel")
+			return
+
 	current_channel_id = ctx.message.channel.id
 	user_id = ctx.message.author.id
-	channel = bot.get_channel(current_channel_id)
-	messages = await ctx.channel.history(limit=amt).flatten()
+	if isChannel:
+		channel = bot.get_channel(ctx.message.channel_mentions[0])
+	else:
+		channel = bot.get_channel(current_channel_id)
+	messages = await channel.history(limit=amt).flatten()
 
 	sentence = []
 	for msg in messages:
