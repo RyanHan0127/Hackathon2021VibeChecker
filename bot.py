@@ -52,9 +52,9 @@ async def vibecheck(ctx, *arg):
 
 	sentence = []
 	for msg in messages:
-		if msg.content != '!vibecheck' and msg.content != '':
+		if not '!vibecheck' in msg.content and msg.content != '':
 			sentence.append(msg.content)
-	#print(sentence)
+
 	analyzer = sia()
 	list_res = []
 	for sen in sentence:
