@@ -8,7 +8,7 @@ def plot(cumPOUND_score):
     freq=2
     width_range=1
     samples=1000
-    terms=np.round(10*(-1*cumPOUND_score+1)+1) #some sort of mapping from cumpound score
+    terms=int(np.round(10*(-1*cumPOUND_score+1)+1)) #some sort of mapping from cumpound score
 
     # Periodicity of the periodic function f(x)
     # No of waves in time period L

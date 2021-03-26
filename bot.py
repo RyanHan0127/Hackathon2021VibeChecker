@@ -26,33 +26,55 @@ async def vibecheck(ctx, *arg):
 
 	#Error checking
 	#Probably should refactor to allow multiple arguments
-	if len(arg) > 1:
-		await ctx.send("Incorrect number of arguments: 0 or 1")
+	if len(arg) > 3:
+		await ctx.send("Incorrect number of arguments: format is \"!vibecheck [NUMBER OF MESSAGES] [MENTION] [CHANNEL]\", 3 max arguments")
 		return
 
 	isMention = False
 	isInteger = False
 	isChannel = False
-	if len(arg) == 0: #Assumes default (current channel, 100 messages)
-		pass
-	elif ctx.message.mentions:
-		print("Is a mention")
-		isMention = True
-	elif ctx.message.channel_mentions:
-		print("Is a channel mention")
-		isChannel = True
-	else:
-		try:
-			amt = int(arg[0])
-			isInteger = True
-		except ValueError:
-			isInteger = False
-		if isInteger:
-			print("Is an integer")
-		else:
-			print("Not an integer")
-			await ctx.send("Argument passed was not an integer, mention, or channel")
+	manyInts = False
+	intError = False
+
+	mentions = ctx.message.mentions
+	channel_mentions = ctx.message.channel_mentions
+
+	#Check if mention exists and there is only 1
+	if mentions:
+		if len(mentions) > 1:
+			await ctx.send("Incorrect number of mentions: 1 maximum")
 			return
+		print("Has a mention")
+		isMention = True
+
+	#Check if channel mention exists and there is only 1
+	if channel_mentions:
+		if len(channel_mentions) > 1:
+			await ctx.send("Incorrect number of channel mentions: 1 maximum")
+			return
+		print("Has a channel mention")
+		isChannel = True
+	
+	#Check if integer exists and there is only 1
+	#Not working rn, trying to fix
+	try:
+		for a in arg:
+			b = str(a)
+			c = commands.MemberConverter.convert(ctx,b)
+			print(c)
+			amt = int(a)
+			if isInteger:
+				manyInts = True
+				break
+			isInteger = True
+	except ValueError:
+		pass
+	if manyInts:
+		print("Has too many integers")
+		await ctx.send("Argument passed was not an integer, mention, or channel")
+		return
+	elif isInteger:
+		print("Has an integer")
 
 	# The bot needs to know which channel the author input
         # the command to in order to do the sentiment analysis
