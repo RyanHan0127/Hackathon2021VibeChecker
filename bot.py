@@ -25,15 +25,11 @@ async def vibecheck(ctx, *arg):
 
 	#Error checking
 	#Probably should refactor to allow multiple arguments
-	if len(arg) > 3:
-		await ctx.send("Incorrect number of arguments: format is \"!vibecheck [NUMBER OF MESSAGES] [MENTION] [CHANNEL]\", 3 max arguments")
-		return
 
-	isMention = False
-	isInteger = False
-	isChannel = False
+	hasMention = False
+	hasInteger = False
+	hasChannel = False
 	manyInts = False
-	intError = False
 
 	mentions = ctx.message.mentions
 	channel_mentions = ctx.message.channel_mentions
@@ -44,7 +40,7 @@ async def vibecheck(ctx, *arg):
 			await ctx.send("Incorrect number of mentions: 1 maximum")
 			return
 		print("Has a mention")
-		isMention = True
+		hasMention = True
 
 	#Check if channel mention exists and there is only 1
 	if channel_mentions:
@@ -52,27 +48,24 @@ async def vibecheck(ctx, *arg):
 			await ctx.send("Incorrect number of channel mentions: 1 maximum")
 			return
 		print("Has a channel mention")
-		isChannel = True
+		hasChannel = True
 	
 	#Check if integer exists and there is only 1
 	#Not working rn, trying to fix
-	try:
-		for a in arg:
-			b = str(a)
-			c = commands.MemberConverter.convert(ctx,b)
-			print(c)
+	for a in arg:
+		try:
 			amt = int(a)
-			if isInteger:
+			if hasInteger:
 				manyInts = True
 				break
-			isInteger = True
-	except ValueError:
-		pass
+			hasInteger = True
+		except ValueError:
+			pass
 	if manyInts:
 		print("Has too many integers")
-		await ctx.send("Argument passed was not an integer, mention, or channel")
+		await ctx.send("Incorrect number of integers: 1 maximum")
 		return
-	elif isInteger:
+	elif hasInteger:
 		print("Has an integer")
 
 	# The bot needs to know which channel the author input
@@ -80,7 +73,7 @@ async def vibecheck(ctx, *arg):
 	current_channel_id = ctx.message.channel.id
 	user_id = ctx.message.author.id
 
-	if isChannel:
+	if hasChannel:
 		channel = ctx.message.channel_mentions[0]
 	else:
 		channel = bot.get_channel(current_channel_id)
@@ -90,7 +83,7 @@ async def vibecheck(ctx, *arg):
 	# need to fix this code block so it actually parses 
         # history for mentioned user's messages
 	# or if not we can just remove the mention arg
-	if isMention:
+	if hasMention:
 		for message in history:
 			if message.author.id == ctx.message.mentions[0].id:
 				history.append(message)
