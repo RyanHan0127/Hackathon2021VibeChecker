@@ -26,6 +26,7 @@ def plot(cumPOUND_score):
     k*x/L) for k in range(1,terms+1)])
 
     # Plotting
+    plt.figure()
     plt.plot(x,s,label="Fourier series")
     plt.xlabel("$x$")
     plt.ylabel("$y=f(x)$")
