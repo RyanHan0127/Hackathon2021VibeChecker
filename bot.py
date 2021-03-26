@@ -103,7 +103,6 @@ async def vibecheck(ctx, *arg):
 			count_sen += 1
 		if count_sen == amt:
 			break
-	print(sentence)
 
 	#Analysis starts here
 	analyzer = sia()
