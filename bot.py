@@ -17,8 +17,7 @@ bot = commands.Bot(BOT_PREFIX)
 #Vibecheck Command implementation starts here
 #Takes zero to one arguement
 #    - "!vibecheck": Do an analysis of the first 100 messages
-#    - "!vibecheck n": Do an analysis of the first n messages.
-#       n must be an integer.
+#    - "!vibecheck [NUMBER OF MESSAGES] [MENTION] [CHANNEL]"
 @bot.command(name = 'vibecheck', pass_context=True)
 async def vibecheck(ctx, *arg):
 	
@@ -86,7 +85,7 @@ async def vibecheck(ctx, *arg):
 	else:
 		channel = bot.get_channel(current_channel_id)
 
-	history = channel.history(limit=amt)
+	history = channel.history()
 
 	# need to fix this code block so it actually parses 
         # history for mentioned user's messages
@@ -101,12 +100,17 @@ async def vibecheck(ctx, *arg):
 	# Grab all the sentences that does not 
     # contain the command and empty strings
 	sentence = []
+	count_sen = 0
 	for msg in messages:
 		str_url_removed = re.sub('http[s]?://\S+', '', msg.content, flags=re.MULTILINE) #Remove urls
 		str_mention_removed = re.sub('<@![0-9]+>', '', str_url_removed, flags=re.MULTILINE) #Remove mentions
 		str_channel_removed = re.sub('<#[0-9]+>', '', str_mention_removed, flags=re.MULTILINE) #Remove channel
 		if not '!vibecheck' in str_channel_removed and str_channel_removed != '':
 			sentence.append(str_channel_removed)
+			count_sen += 1
+		if count_sen == amt:
+			break
+	print(sentence)
 
 	#Analysis starts here
 	analyzer = sia()
@@ -114,14 +118,11 @@ async def vibecheck(ctx, *arg):
 	#Only one sentence at a time can do the analysis
 	for sen in sentence:
 		vs = analyzer.polarity_scores(sen)
-		#sen_tuple = (sen, vs['compound'])
 		list_res.append(vs['compound'])
-	#Printing the result of the analysis. We care about the compound score.
+	#Getting the average of compound scores and plotting with our created plot.py
 	mean = float(np.mean(np.array(list_res)))
 	png = plot.plot(mean)
 	pct = (mean + 1) / 2 * 100
-	print(mean)
-	print(pct)
 	contentstr = "The last " + str(amt) + " messages had " + str(round(pct,2)) + "% good vibes, here's the graph:"
 	await ctx.send(content=contentstr, file=discord.File(png))
 	os.remove(png)
