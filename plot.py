@@ -22,8 +22,7 @@ def plot(cumPOUND_score):
     bn=lambda n:2.0/L*simps(y*np.sin(2.*np.pi*n*x/L),x)
 
     # Sum of the series
-    s=a0/2.+sum([an(k)*np.cos(2.*np.pi*k*x/L)+bn(k)*np.sin(2.*np.pi*
-    k*x/L) for k in range(1,terms+1)])
+    s=a0/2.+sum([an(k)*np.cos(2.*np.pi*k*x/L)+bn(k)*np.sin(2.*np.pi*k*x/L) for k in range(1,terms+1)])
 
     # Plotting
     plt.figure()
