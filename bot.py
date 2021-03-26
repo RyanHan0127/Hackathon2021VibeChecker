@@ -13,7 +13,11 @@ bot = commands.Bot(BOT_PREFIX)
 
 @bot.command(name = 'vibecheck', pass_context=True)
 async def vibecheck(ctx, *arg):
+	
 	amt = MSG_LIMIT
+
+	#Error checking
+	#Probably should refactor to allow multiple arguments
 	if len(arg) > 1:
 		await ctx.send("Incorrect number of arguments: 0 or 1")
 		return
@@ -21,7 +25,7 @@ async def vibecheck(ctx, *arg):
 	isMention = False
 	isInteger = False
 	isChannel = False
-	if len(arg) == 0:
+	if len(arg) == 0: #Assumes default (current channel, 100 messages)
 		pass
 	elif ctx.message.mentions:
 		print("Is a mention")
