@@ -1,23 +1,28 @@
-import discord
+import discord 
 import logging
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv #For hiding token
 from discord.ext import commands
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as sia
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as sia #Sentiment API
 
 load_dotenv()
-BOT_PREFIX = ("!")
+BOT_PREFIX = ("!") 
 TOKEN = os.getenv('DISCORD_TOKEN')
 MSG_LIMIT = 100
-bot = commands.Bot(BOT_PREFIX)
+bot = commands.Bot(BOT_PREFIX) #Creating the bot with the prefix
 
-@bot.command(name = 'vibecheck', pass_context=True)
+#Vibecheck Command implementation starts here
+#Takes zero to one arguement
+#    - "!vibecheck": Do an analysis of the first 100 messages
+#    - "!vibecheck n": Do an analysis of the first n messages. n must be an integer.
+@bot.command(name = 'vibecheck', pass_context=True) 
 async def vibecheck(ctx, *arg):
 	amt = MSG_LIMIT
-	if len(arg) > 1:
+	if len(arg) > 1: #Checking the number of arguments
 		await ctx.send("Incorrect number of arguments: 0 or 1")
 		return
 
+	#Argument handling checker. Needs to be an integer, and not mentions, channel, or any other string
 	isMention = False
 	isInteger = False
 	isChannel = False
@@ -42,25 +47,31 @@ async def vibecheck(ctx, *arg):
 			await ctx.send("Argument passed was not an integer, mention, or channel")
 			return
 
+	#The bot needs to look at which channel did the author inputted the command
+	#to do the sentiment analysis
 	current_channel_id = ctx.message.channel.id
 	user_id = ctx.message.author.id
 	if isChannel:
 		channel = ctx.message.channel_mentions[0]
 	else:
 		channel = bot.get_channel(current_channel_id)
-	messages = await channel.history(limit=amt).flatten()
+	messages = await channel.history(limit=amt).flatten() #Grabbing the first (amt) messages
 
+	#Grab all the sentences that does not contain the command and empty strings
 	sentence = []
 	for msg in messages:
 		if not '!vibecheck' in msg.content and msg.content != '':
 			sentence.append(msg.content)
 
+	#Analysis starts here
 	analyzer = sia()
 	list_res = []
+	#Only one sentence at a time can do the analysis
 	for sen in sentence:
 		vs = analyzer.polarity_scores(sen)
 		sen_tuple = (sen, vs['compound'])
 		list_res.append(sen_tuple)
+	#Printing the result of the analysis. We care about the compound score.
 	for i in list_res:
 		print(i)
 	#print(list_res)
