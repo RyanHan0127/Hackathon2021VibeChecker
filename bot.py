@@ -98,7 +98,7 @@ async def vibecheck(ctx, *arg):
 		str_url_removed = re.sub('http[s]?://\S+', '', msg.content, flags=re.MULTILINE) #Remove urls
 		str_mention_removed = re.sub('<@![0-9]+>', '', str_url_removed, flags=re.MULTILINE) #Remove mentions
 		str_channel_removed = re.sub('<#[0-9]+>', '', str_mention_removed, flags=re.MULTILINE) #Remove channel
-		if not '!vibecheck' in str_channel_removed and str_channel_removed != '':
+		if msg.author.id != bot.user.id and not '!vibecheck' in str_channel_removed and str_channel_removed != '':
 			sentence.append(str_channel_removed)
 			count_sen += 1
 		if count_sen == amt:
