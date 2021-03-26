@@ -1,6 +1,7 @@
 import discord
 import logging
 import os
+import re
 from dotenv import load_dotenv #For hiding token
 from discord.ext import commands
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as sia
@@ -74,11 +75,14 @@ async def vibecheck(ctx, *arg):
 	messages = await history.flatten()
 
 	# Grab all the sentences that does not 
-        # contain the command and empty strings
+    # contain the command and empty strings
 	sentence = []
 	for msg in messages:
-		if not '!vibecheck' in msg.content and msg.content != '':
-			sentence.append(msg.content)
+		str_url_removed = re.sub('http[s]?://\S+', '', msg.content, flags=re.MULTILINE) #Remove urls
+		str_mention_removed = re.sub('<@![0-9]+>', '', str_url_removed, flags=re.MULTILINE) #Remove mentions
+		str_channel_removed = re.sub('<#[0-9]+>', '', str_mention_removed, flags=re.MULTILINE) #Remove channel
+		if not '!vibecheck' in str_channel_removed and str_channel_removed != '':
+			sentence.append(str_channel_removed)
 
 	#Analysis starts here
 	analyzer = sia()
