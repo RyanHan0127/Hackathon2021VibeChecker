@@ -115,7 +115,7 @@ async def vibecheck(ctx, *arg):
 	mean = float(np.mean(np.array(list_res)))
 	png = plot.plot(mean)
 	pct = (mean + 1) / 2 * 100
-	contentstr = "The last " + str(amt) + " messages had " + str(round(pct,2)) + "% good vibes, here's the graph:"
+	contentstr = "The last " + str(amt) + " messages in " + channel.mention + " had " + str(round(pct,2)) + "% good vibes, here's the graph:"
 	await ctx.send(content=contentstr, file=discord.File(png))
 	os.remove(png)
 
