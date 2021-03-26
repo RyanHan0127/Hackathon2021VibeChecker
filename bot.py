@@ -44,11 +44,22 @@ async def vibecheck(ctx, *arg):
 
 	current_channel_id = ctx.message.channel.id
 	user_id = ctx.message.author.id
+
 	if isChannel:
 		channel = ctx.message.channel_mentions[0]
 	else:
 		channel = bot.get_channel(current_channel_id)
-	messages = await channel.history(limit=amt).flatten()
+
+	history = channel.history(limit=amt)
+
+	#need to fix this code block so it actually parses history for mentioned user's messages
+	#or if not we can just remove the mention arg
+	if isMention:
+		for message in history:
+			if message.author.id == ctx.message.mentions[0].id:
+				history.append(message)
+	
+	messages = await history.flatten()
 
 	sentence = []
 	for msg in messages:
@@ -64,6 +75,12 @@ async def vibecheck(ctx, *arg):
 	for i in list_res:
 		print(i)
 	#print(list_res)
+
+	#compile weighted average or whatever
+	#it looks like list_res prints from most to least recent
+
+	#graph w/ whatever Dylan wants here idk
+
 	#await ctx.send("Vibe Check")
 
 @bot.event
