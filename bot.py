@@ -118,17 +118,9 @@ async def vibecheck(ctx, *arg):
 		list_res.append(vs['compound'])
 	#Printing the result of the analysis. We care about the compound score.
 	mean = float(np.mean(np.array(list_res)))
-	print(type(mean))
 	png = plot.plot(mean)
-	print(png)
-	#print(list_res)
-
-	#compile weighted average or whatever
-	#it looks like list_res prints from most to least recent
-
-	#graph w/ whatever Dylan wants here idk
-
-	#await ctx.send("Vibe Check")
+	await ctx.send(file=discord.File(png))
+	os.remove(png)
 
 @bot.event
 async def on_ready():
