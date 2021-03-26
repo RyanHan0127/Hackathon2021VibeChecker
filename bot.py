@@ -119,7 +119,11 @@ async def vibecheck(ctx, *arg):
 	#Printing the result of the analysis. We care about the compound score.
 	mean = float(np.mean(np.array(list_res)))
 	png = plot.plot(mean)
-	await ctx.send(file=discord.File(png))
+	pct = (mean + 1) / 2 * 100
+	print(mean)
+	print(pct)
+	contentstr = "The last " + str(amt) + " messages had " + str(round(pct,2)) + "% good vibes, here's the graph:"
+	await ctx.send(content=contentstr, file=discord.File(png))
 	os.remove(png)
 
 @bot.event
