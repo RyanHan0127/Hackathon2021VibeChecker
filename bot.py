@@ -1,32 +1,35 @@
-import discord 
+import discord
 import logging
 import os
 from dotenv import load_dotenv #For hiding token
 from discord.ext import commands
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as sia #Sentiment API
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as sia
 
 load_dotenv()
-BOT_PREFIX = ("!") 
+BOT_PREFIX = ("!")
 TOKEN = os.getenv('DISCORD_TOKEN')
 MSG_LIMIT = 100
-bot = commands.Bot(BOT_PREFIX) #Creating the bot with the prefix
+bot = commands.Bot(BOT_PREFIX)
 
 #Vibecheck Command implementation starts here
 #Takes zero to one arguement
 #    - "!vibecheck": Do an analysis of the first 100 messages
 #    - "!vibecheck n": Do an analysis of the first n messages. n must be an integer.
-@bot.command(name = 'vibecheck', pass_context=True) 
+@bot.command(name = 'vibecheck', pass_context=True)
 async def vibecheck(ctx, *arg):
+	
 	amt = MSG_LIMIT
-	if len(arg) > 1: #Checking the number of arguments
+
+	#Error checking
+	#Probably should refactor to allow multiple arguments
+	if len(arg) > 1:
 		await ctx.send("Incorrect number of arguments: 0 or 1")
 		return
 
-	#Argument handling checker. Needs to be an integer, and not mentions, channel, or any other string
 	isMention = False
 	isInteger = False
 	isChannel = False
-	if len(arg) == 0:
+	if len(arg) == 0: #Assumes default (current channel, 100 messages)
 		pass
 	elif ctx.message.mentions:
 		print("Is a mention")
@@ -51,11 +54,22 @@ async def vibecheck(ctx, *arg):
 	#to do the sentiment analysis
 	current_channel_id = ctx.message.channel.id
 	user_id = ctx.message.author.id
+
 	if isChannel:
 		channel = ctx.message.channel_mentions[0]
 	else:
 		channel = bot.get_channel(current_channel_id)
-	messages = await channel.history(limit=amt).flatten() #Grabbing the first (amt) messages
+
+	history = channel.history(limit=amt)
+
+	#need to fix this code block so it actually parses history for mentioned user's messages
+	#or if not we can just remove the mention arg
+	if isMention:
+		for message in history:
+			if message.author.id == ctx.message.mentions[0].id:
+				history.append(message)
+	
+	messages = await history.flatten()
 
 	#Grab all the sentences that does not contain the command and empty strings
 	sentence = []
@@ -75,6 +89,12 @@ async def vibecheck(ctx, *arg):
 	for i in list_res:
 		print(i)
 	#print(list_res)
+
+	#compile weighted average or whatever
+	#it looks like list_res prints from most to least recent
+
+	#graph w/ whatever Dylan wants here idk
+
 	#await ctx.send("Vibe Check")
 
 @bot.event
