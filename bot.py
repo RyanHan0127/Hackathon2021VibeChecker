@@ -23,8 +23,8 @@ async def vibecheck(ctx, *arg):
 	
 	amt = MSG_LIMIT
 
-	#Error checking
-	#Probably should refactor to allow multiple arguments
+	# Error checking
+	# Refactored to allow multiple arguments
 
 	hasMention = False
 	hasInteger = False
@@ -34,7 +34,7 @@ async def vibecheck(ctx, *arg):
 	mentions = ctx.message.mentions
 	channel_mentions = ctx.message.channel_mentions
 
-	#Check if mention exists and there is only 1
+	# Check if mention exists and there is only 1
 	if mentions:
 		if len(mentions) > 1:
 			await ctx.send("Incorrect number of mentions: 1 maximum")
@@ -42,7 +42,7 @@ async def vibecheck(ctx, *arg):
 		print("Has a mention")
 		hasMention = True
 
-	#Check if channel mention exists and there is only 1
+	# Check if channel mention exists and there is only 1
 	if channel_mentions:
 		if len(channel_mentions) > 1:
 			await ctx.send("Incorrect number of channel mentions: 1 maximum")
@@ -50,8 +50,7 @@ async def vibecheck(ctx, *arg):
 		print("Has a channel mention")
 		hasChannel = True
 	
-	#Check if integer exists and there is only 1
-	#Not working rn, trying to fix
+	# Check if integer exists and there is only 1
 	for a in arg:
 		try:
 			amt = int(a)
@@ -69,29 +68,20 @@ async def vibecheck(ctx, *arg):
 		print("Has an integer")
 
 	# The bot needs to know which channel the author input
-        # the command to in order to do the sentiment analysis
+    # the command to in order to do the sentiment analysis
 	current_channel_id = ctx.message.channel.id
-	user_id = ctx.message.author.id
 
+	# Change channel to analyze if option exists
 	if hasChannel:
 		channel = ctx.message.channel_mentions[0]
 	else:
 		channel = bot.get_channel(current_channel_id)
 
-	history = channel.history()
+	messages = await channel.history().flatten()
 
-	# need to fix this code block so it actually parses 
-        # history for mentioned user's messages
-	# or if not we can just remove the mention arg
-	if hasMention:
-		for message in history:
-			if message.author.id == ctx.message.mentions[0].id:
-				history.append(message)
-	
-	messages = await history.flatten()
-
-	# Grab all the sentences that does not 
+	# Grab all the sentences that do not 
     # contain the command and empty strings
+	# Check for mentioned user if needed as well
 	sentence = []
 	count_sen = 0
 	for msg in messages:
@@ -101,21 +91,30 @@ async def vibecheck(ctx, *arg):
 		if msg.author.id != bot.user.id and not '!vibecheck' in str_channel_removed and str_channel_removed != '':
 			sentence.append(str_channel_removed)
 			count_sen += 1
+		if hasMention and mentions[0].id == msg.author.id:
+			sentence.append(str_channel_removed)
+			count_sen += 1
 		if count_sen == amt:
 			break
 
-	#Analysis starts here
+	# Analysis starts here
 	analyzer = sia()
 	list_res = []
-	#Only one sentence at a time can do the analysis
+	# Only can analyze one sentence at a time
+	# list_res gives messages from most to least recent
 	for sen in sentence:
 		vs = analyzer.polarity_scores(sen)
 		list_res.append(vs['compound'])
-	#Getting the average of compound scores and plotting with our created plot.py
+	# Getting the average of compound scores and plotting with our created plot.py
 	mean = float(np.mean(np.array(list_res)))
 	png = plot.plot(mean)
 	pct = (mean + 1) / 2 * 100
-	contentstr = "The last " + str(amt) + " messages in " + channel.mention + " had " + str(round(pct,2)) + "% good vibes, here's the graph:"
+
+	# Create return string, send it and the plot
+	contentstr = "The last " + str(amt) + " messages in " + channel.mention
+	if hasMention:
+		contentstr += " from " + mentions[0].mention
+	contentstr += " had " + str(round(pct,2)) + "% good vibes, here's the graph:"
 	await ctx.send(content=contentstr, file=discord.File(png))
 	os.remove(png)
 
