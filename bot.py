@@ -2,6 +2,8 @@ import discord
 import logging
 import os
 import re
+import plot
+import numpy as np
 from dotenv import load_dotenv #For hiding token
 from discord.ext import commands
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as sia
@@ -90,11 +92,13 @@ async def vibecheck(ctx, *arg):
 	#Only one sentence at a time can do the analysis
 	for sen in sentence:
 		vs = analyzer.polarity_scores(sen)
-		sen_tuple = (sen, vs['compound'])
-		list_res.append(sen_tuple)
+		#sen_tuple = (sen, vs['compound'])
+		list_res.append(vs['compound'])
 	#Printing the result of the analysis. We care about the compound score.
-	for i in list_res:
-		print(i)
+	mean = float(np.mean(np.array(list_res)))
+	print(type(mean))
+	png = plot.plot(mean)
+	print(png)
 	#print(list_res)
 
 	#compile weighted average or whatever
