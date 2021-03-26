@@ -1,0 +1,5 @@
+-upload plotted image of vibes, the worse the vibes the higher the order of the fourier series for a sawtooth wave
+-check vibes for a given user
+-consider variance of vibes in the check
+-check general vibes across all channels (which channel has the best vibes?)
+-

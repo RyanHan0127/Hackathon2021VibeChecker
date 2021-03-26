@@ -14,7 +14,8 @@ bot = commands.Bot(BOT_PREFIX)
 #Vibecheck Command implementation starts here
 #Takes zero to one arguement
 #    - "!vibecheck": Do an analysis of the first 100 messages
-#    - "!vibecheck n": Do an analysis of the first n messages. n must be an integer.
+#    - "!vibecheck n": Do an analysis of the first n messages.
+#       n must be an integer.
 @bot.command(name = 'vibecheck', pass_context=True)
 async def vibecheck(ctx, *arg):
 	
@@ -50,8 +51,8 @@ async def vibecheck(ctx, *arg):
 			await ctx.send("Argument passed was not an integer, mention, or channel")
 			return
 
-	#The bot needs to look at which channel did the author inputted the command
-	#to do the sentiment analysis
+	# The bot needs to know which channel the author input
+        # the command to in order to do the sentiment analysis
 	current_channel_id = ctx.message.channel.id
 	user_id = ctx.message.author.id
 
@@ -62,8 +63,9 @@ async def vibecheck(ctx, *arg):
 
 	history = channel.history(limit=amt)
 
-	#need to fix this code block so it actually parses history for mentioned user's messages
-	#or if not we can just remove the mention arg
+	# need to fix this code block so it actually parses 
+        # history for mentioned user's messages
+	# or if not we can just remove the mention arg
 	if isMention:
 		for message in history:
 			if message.author.id == ctx.message.mentions[0].id:
@@ -71,7 +73,8 @@ async def vibecheck(ctx, *arg):
 	
 	messages = await history.flatten()
 
-	#Grab all the sentences that does not contain the command and empty strings
+	# Grab all the sentences that does not 
+        # contain the command and empty strings
 	sentence = []
 	for msg in messages:
 		if not '!vibecheck' in msg.content and msg.content != '':
