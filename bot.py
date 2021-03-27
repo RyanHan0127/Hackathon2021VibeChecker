@@ -96,7 +96,7 @@ async def vibecheck(ctx, *arg):
 			count_sen += 1
 		if count_sen == amt:
 			break
-
+	print(sentence)
 	# Analysis starts here
 	analyzer = sia()
 	list_res = []
@@ -108,7 +108,7 @@ async def vibecheck(ctx, *arg):
 	# Getting the average of compound scores and plotting with our created plot.py
 	list_arr = np.array(list_res)
 	for spot,value in enumerate(list_arr):
-		list_arr[spot] = value*((MSG_LIMIT-spot-1)/MSG_LIMIT)
+		list_arr[spot] = value*((amt-spot-1)/amt)
 	mean = float(np.mean(list_arr))
 	png = plot.plot(mean)
 	pct = (mean + 1) / 2 * 100
