@@ -14,10 +14,10 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 MSG_LIMIT = 100
 bot = commands.Bot(BOT_PREFIX)
 
-#Vibecheck Command implementation starts here
-#Takes zero to one arguement
-#    - "!vibecheck": Do an analysis of the first 100 messages
+# Vibecheck Command implementation starts here
+# Takes one argument per field
 #    - "!vibecheck [NUMBER OF MESSAGES] [MENTION] [CHANNEL]"
+#    - "!vibecheck": default options are 100 messages, all users, current channel
 @bot.command(name = 'vibecheck', pass_context=True)
 async def vibecheck(ctx, *arg):
 	
@@ -26,10 +26,10 @@ async def vibecheck(ctx, *arg):
 	# Error checking
 	# Refactored to allow multiple arguments
 
-	hasMention = False
-	hasInteger = False
-	hasChannel = False
-	manyInts = False
+	has_mention = False
+	has_integer = False
+	has_channel = False
+	many_ints = False
 
 	mentions = ctx.message.mentions
 	channel_mentions = ctx.message.channel_mentions
@@ -40,7 +40,7 @@ async def vibecheck(ctx, *arg):
 			await ctx.send("Incorrect number of mentions: 1 maximum")
 			return
 		print("Has a mention")
-		hasMention = True
+		has_mention = True
 
 	# Check if channel mention exists and there is only 1
 	if channel_mentions:
@@ -48,23 +48,23 @@ async def vibecheck(ctx, *arg):
 			await ctx.send("Incorrect number of channel mentions: 1 maximum")
 			return
 		print("Has a channel mention")
-		hasChannel = True
+		has_channel = True
 	
 	# Check if integer exists and there is only 1
 	for a in arg:
 		try:
 			amt = int(a)
-			if hasInteger:
-				manyInts = True
+			if has_integer:
+				many_ints = True
 				break
-			hasInteger = True
+			has_integer = True
 		except ValueError:
 			pass
-	if manyInts:
+	if many_ints:
 		print("Has too many integers")
 		await ctx.send("Incorrect number of integers: 1 maximum")
 		return
-	elif hasInteger:
+	elif has_integer:
 		print("Has an integer")
 
 	# The bot needs to know which channel the author input
@@ -72,7 +72,7 @@ async def vibecheck(ctx, *arg):
 	current_channel_id = ctx.message.channel.id
 
 	# Change channel to analyze if option exists
-	if hasChannel:
+	if has_channel:
 		channel = ctx.message.channel_mentions[0]
 	else:
 		channel = bot.get_channel(current_channel_id)
@@ -85,13 +85,13 @@ async def vibecheck(ctx, *arg):
 	sentence = []
 	count_sen = 0
 	for msg in messages:
-		str_url_removed = re.sub('http[s]?://\S+', '', msg.content, flags=re.MULTILINE) #Remove urls
-		str_mention_removed = re.sub('<@![0-9]+>', '', str_url_removed, flags=re.MULTILINE) #Remove mentions
-		str_channel_removed = re.sub('<#[0-9]+>', '', str_mention_removed, flags=re.MULTILINE) #Remove channel
+		str_url_removed = re.sub('http[s]?://\S+', '', msg.content, flags=re.MULTILINE) # Remove urls
+		str_mention_removed = re.sub('<@![0-9]+>', '', str_url_removed, flags=re.MULTILINE) # Remove mentions
+		str_channel_removed = re.sub('<#[0-9]+>', '', str_mention_removed, flags=re.MULTILINE) # Remove channel
 		if msg.author.id != bot.user.id and not '!vibecheck' in str_channel_removed and str_channel_removed != '':
 			sentence.append(str_channel_removed)
 			count_sen += 1
-		if hasMention and mentions[0].id == msg.author.id:
+		if has_mention and mentions[0].id == msg.author.id:
 			sentence.append(str_channel_removed)
 			count_sen += 1
 		if count_sen == amt:
@@ -105,20 +105,27 @@ async def vibecheck(ctx, *arg):
 	for sen in sentence:
 		vs = analyzer.polarity_scores(sen)
 		list_res.append(vs['compound'])
-	# Getting the average of compound scores and plotting with our created plot.py
+	# Getting the weighted average of compound scores and plotting with our created plot.py
 	list_arr = np.array(list_res)
+	reg_mean = mean = float(np.mean(list_arr))
 	for spot,value in enumerate(list_arr):
 		list_arr[spot] = value*((amt-spot-1)/amt)
 	mean = float(np.mean(list_arr))
 	png = plot.plot(mean)
+
+	reg_pct = (reg_mean + 1) / 2 * 100
 	pct = (mean + 1) / 2 * 100
 
+	# Compare regular mean with weighted mean
+	print(reg_pct)
+	print(pct)
+
 	# Create return string, send it and the plot
-	contentstr = "The last " + str(amt) + " messages in " + channel.mention
-	if hasMention:
-		contentstr += " from " + mentions[0].mention
-	contentstr += " had " + str(round(pct,2)) + "% good vibes, here's the graph:"
-	await ctx.send(content=contentstr, file=discord.File(png))
+	content_str = "The last " + str(amt) + " messages in " + channel.mention
+	if has_mention:
+		content_str += " from " + mentions[0].mention
+	content_str += " had " + str(round(pct,2)) + "% good vibes, here's the graph:"
+	await ctx.send(content=content_str, file=discord.File(png))
 	os.remove(png)
 
 @bot.event
