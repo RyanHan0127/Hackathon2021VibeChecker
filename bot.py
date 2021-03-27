@@ -79,7 +79,7 @@ async def vibecheck(ctx, *arg):
 
 	messages = await channel.history().flatten()
 
-	# Grab all the sentences that do not 
+	# Grab all the sentences that do not
     # contain the command and empty strings
 	# Check for mentioned user if needed as well
 	sentence = []
@@ -106,7 +106,10 @@ async def vibecheck(ctx, *arg):
 		vs = analyzer.polarity_scores(sen)
 		list_res.append(vs['compound'])
 	# Getting the average of compound scores and plotting with our created plot.py
-	mean = float(np.mean(np.array(list_res)))
+	list_arr = np.array(list_res)
+	for spot,value in enumerate(list_arr):
+		list_arr[spot] = value*((MSG_LIMIT-spot-1)/MSG_LIMIT)
+	mean = float(np.mean(list_arr))
 	png = plot.plot(mean)
 	pct = (mean + 1) / 2 * 100
 
