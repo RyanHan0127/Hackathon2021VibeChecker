@@ -9,7 +9,7 @@ from scipy.integrate import simps
 
 def plot(cumPOUND_score):
     L=1
-    freq=5
+    freq=1
     width_range=1
     samples=1000
     cps = (cumPOUND_score+1)/2
@@ -29,7 +29,7 @@ def plot(cumPOUND_score):
     # Periodicity of the periodic function f(x)
     # No of waves in time period L
     # Generation of Sawtooth function
-    x=np.linspace(0,L*freq,samples,endpoint=False)
+    x=np.linspace(0,L*5,samples,endpoint=False)
     y=sawtooth(2.0*np.pi*x*freq/L,width=width_range)
 
     # Calculation of Co-efficients
