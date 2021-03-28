@@ -12,7 +12,7 @@ def plot(cumPOUND_score):
     freq=5
     width_range=1
     samples=1000
-    cps = ((-1*cumPOUND_score)+1)/2
+    cps = (cumPOUND_score+1)/2
     if cps > 0.6:
         terms = 1
     elif cps > 0.4:
