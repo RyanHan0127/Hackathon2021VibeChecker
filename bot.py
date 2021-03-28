@@ -96,7 +96,6 @@ async def vibecheck(ctx, *arg):
 			count_sen += 1
 		if count_sen == amt:
 			break
-	print(sentence)
 	# Analysis starts here
 	analyzer = sia()
 	list_res = []
@@ -109,13 +108,13 @@ async def vibecheck(ctx, *arg):
 	list_arr = np.array(list_res)
 	reg_mean = mean = float(np.mean(list_arr))
 	for spot,value in enumerate(list_arr):
-                if list_arr[spot] < -0.1:
-                        list_arr[spot] = -1
-                elif list_arr[spot] > 0.1:
-                        list_arr[spot] = 1
-                else:
-                        list_arr[spot] = 0
-	        list_arr[spot] = value*((amt-spot)/amt)
+		if list_arr[spot] < -0.1:
+			list_arr[spot] = -1
+		elif list_arr[spot] > 0.1:
+			list_arr[spot] = 1
+		else:
+			list_arr[spot] = 0
+	list_arr[spot] = value*((amt-spot)/amt)
 	mean = float(np.mean(list_arr))
 	png = plot.plot(mean)
 
