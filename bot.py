@@ -109,7 +109,7 @@ async def vibecheck(ctx, *arg):
 	list_arr = np.array(list_res)
 	reg_mean = mean = float(np.mean(list_arr))
 	for spot,value in enumerate(list_arr):
-		list_arr[spot] = value*((amt-spot-1)/amt)
+		list_arr[spot] = value*((amt-spot)/amt)
 	mean = float(np.mean(list_arr))
 	png = plot.plot(mean)
 
