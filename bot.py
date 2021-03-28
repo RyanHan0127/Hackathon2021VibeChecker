@@ -16,6 +16,7 @@ bot = commands.Bot(BOT_PREFIX)
 
 # Vibecheck Command implementation starts here
 # Takes one argument per field
+# Non-integer, mention, or channel mention arguments are ignored
 #    - "!vibecheck [NUMBER OF MESSAGES] [MENTION] [CHANNEL]"
 #    - "!vibecheck": default options are 100 messages, all users, current channel
 @bot.command(name = 'vibecheck', pass_context=True)
