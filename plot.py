@@ -1,3 +1,7 @@
+# Most of this code is taken from
+# Bhar, Shyamal. "Analysis of Fourier series using Python Code"
+# Department of Physics, Vidyasagar College for Women, Kolkata - 700 006
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import sawtooth
@@ -5,15 +9,27 @@ from scipy.integrate import simps
 
 def plot(cumPOUND_score):
     L=1
-    freq=2
+    freq=5
     width_range=1
     samples=1000
-    terms=int(np.round(10*(-1*cumPOUND_score+1)+1)) #some sort of mapping from cumpound score
+    cps = ((-1*cumPOUND_score)+1)/2
+    if cps > 0.6:
+        terms = 1
+    elif cps > 0.4:
+        terms = 2
+    elif cps > 0.3:
+        terms = 3
+    elif cps > 0.2:
+        terms = 5
+    elif cps > 0.1:
+        terms = 10
+    else:
+        terms = 40
 
     # Periodicity of the periodic function f(x)
     # No of waves in time period L
     # Generation of Sawtooth function
-    x=np.linspace(0,L,samples,endpoint=False)
+    x=np.linspace(0,L*freq,samples,endpoint=False)
     y=sawtooth(2.0*np.pi*x*freq/L,width=width_range)
 
     # Calculation of Co-efficients
@@ -26,10 +42,8 @@ def plot(cumPOUND_score):
 
     # Plotting
     plt.figure()
-    plt.plot(x,s,label="Fourier series")
-    plt.xlabel("$x$")
-    plt.ylabel("$y=f(x)$")
-    plt.legend(loc='best',prop={'size':10})
-    plt.title("Sawtooth wave signal analysis by Fouries series")
-    plt.savefig("fs_sawtooth.png")
+    plt.xticks([])
+    plt.yticks([])
+    plt.plot(x,s)
+    plt.savefig("fs_sawtooth.png", bbox_inches="tight", pad_inches=0)
     return "fs_sawtooth.png"
